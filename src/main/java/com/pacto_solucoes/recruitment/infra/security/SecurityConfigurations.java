@@ -32,6 +32,7 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.GET, "/api/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/swagger/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/vacancy/register").hasRole("RECRUITER")
+                        .requestMatchers(HttpMethod.PUT, "/api/application").hasRole("RECRUITER")
                         .requestMatchers(HttpMethod.POST, "/api/vacancy/apply").hasRole("CANDIDATE")
                         .requestMatchers(HttpMethod.GET, "/api/vacancy").authenticated()
                         .anyRequest().authenticated()
