@@ -2,6 +2,7 @@ package com.pacto_solucoes.recruitment.service;
 
 import com.pacto_solucoes.recruitment.domain.*;
 import com.pacto_solucoes.recruitment.repositories.ApplicationRepository;
+import com.pacto_solucoes.recruitment.repositories.NotificationRepository;
 import com.pacto_solucoes.recruitment.repositories.UserRepository;
 import com.pacto_solucoes.recruitment.repositories.VacancyRepository;
 import io.micrometer.common.util.StringUtils;
@@ -21,6 +22,8 @@ public class VacancyService {
     private UserRepository userRepository;
     @Autowired
     private ApplicationRepository applicationRepository;
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     public Vacancy createVacancy(Vacancy vacancy) throws Exception {
 
@@ -92,6 +95,41 @@ public class VacancyService {
                     Application newApplication = applicationRepository.save(application);
 
                     if(newApplication.getId() != null) {
+                        Long vacancyId = vacancy.getId();
+
+                        Optional<Vacancy> vacancyOwnerOpt = vacancyRepository.findById(vacancyId);
+
+                        if (vacancyOwnerOpt.isEmpty()) {
+                            throw new Exception("Dono da vaga não encontrado!");
+                        }
+
+                        User vacancyOwner = vacancyOwnerOpt
+                                .map(Vacancy::getUser)
+                                .orElseThrow(() -> new Exception("Dono da vaga não encontrado!"));
+
+                        String titleVacancy = vacancyOwnerOpt.map(Vacancy::getTitle).orElseThrow(() -> new Exception("Título da Vaga não encontrado"));
+
+                        String notificationMessage = "O candidato " + user.getName() + " (" + user.getLogin() + ") se candidatou à sua vaga '" + titleVacancy + "'.";
+
+                        Notification notification = new Notification();
+                        notification.setUser(vacancyOwner);
+                        notification.setMessage(notificationMessage);
+                        notification.setCreatedAt(LocalDate.now());
+                        notification.setRead(false);
+                        notificationRepository.save(notification);
+
+                        String notificationMessageForUser = String.format(
+                                "Sua candidatura para a vaga '%s' foi registrada com sucesso.",
+                                titleVacancy
+                        );
+
+                        Notification notificationForUser = new Notification();
+                        notificationForUser.setUser(user);
+                        notificationForUser.setMessage(notificationMessageForUser);
+                        notificationForUser.setCreatedAt(LocalDate.now());
+                        notificationForUser.setRead(false);
+                        notificationRepository.save(notificationForUser);
+
                         return newApplication;
                     }else {
                         throw new Exception("Não foi possível candidatar nessa vaga, tente novamente!");

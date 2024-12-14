@@ -2,7 +2,6 @@ package com.pacto_solucoes.recruitment.service;
 
 import com.pacto_solucoes.recruitment.DTOs.ApplicationUserDTO;
 import com.pacto_solucoes.recruitment.domain.Application;
-import com.pacto_solucoes.recruitment.domain.User;
 import com.pacto_solucoes.recruitment.repositories.ApplicationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
