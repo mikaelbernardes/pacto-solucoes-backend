@@ -17,6 +17,7 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String name;
     private String login;
     private String password;
     private UserRole role;
@@ -24,14 +25,16 @@ public class User implements UserDetails {
     public User(){
     }
 
-    public User(String login, String password, UserRole role){
+    public User(String name, String login, String password, UserRole role){
+        this.name = name;
         this.login = login;
         this.password = password;
         this.role = role;
     }
 
-    public User(Long id, String login, String password, UserRole role){
+    public User(Long id, String name, String login, String password, UserRole role){
         this.id = id;
+        this.name = name;
         this.login = login;
         this.password = password;
         this.role = role;
@@ -82,6 +85,14 @@ public class User implements UserDetails {
 
     public void setLogin(String login) {
         this.login = login;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getPassword() {

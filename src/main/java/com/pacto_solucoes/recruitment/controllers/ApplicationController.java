@@ -1,6 +1,8 @@
 package com.pacto_solucoes.recruitment.controllers;
 
+import com.pacto_solucoes.recruitment.DTOs.ApplicationUserDTO;
 import com.pacto_solucoes.recruitment.domain.Application;
+import com.pacto_solucoes.recruitment.domain.User;
 import com.pacto_solucoes.recruitment.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,15 @@ public class ApplicationController {
         }
 
         return ResponseEntity.ok(applications);
+    }
+
+    @GetMapping("/{vacancyId}/applications/users")
+    public ResponseEntity<List<ApplicationUserDTO>> getUsersByVacancy(@PathVariable Long vacancyId) {
+        List<ApplicationUserDTO> users = applicationService.getUsersByVacancyId(vacancyId);
+        if (users.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(users);
     }
 
     @PutMapping
