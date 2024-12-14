@@ -6,11 +6,13 @@ import com.pacto_solucoes.recruitment.domain.Vacancy;
 import com.pacto_solucoes.recruitment.service.VacancyService;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/vacancy")
@@ -29,6 +31,30 @@ public class VacancyController {
                 return ResponseEntity.ok(vacancies);
             }else {
                 return ResponseEntity.badRequest().body("Nenhuma vaga encontrada!");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Vacancy> getVacancyById(@PathVariable Long id) {
+        return vacancyService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/recruiter/{userId}")
+    public ResponseEntity<Object> listVacanciesByRecruiter(@PathVariable Long userId) {
+        try {
+            List<Vacancy> vacancies = vacancyService.listVacanciesByUserId(userId);
+
+            if (vacancies != null && !vacancies.isEmpty()) {
+                return ResponseEntity.ok(vacancies);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhuma vaga encontrada para o recrutador!");
             }
 
         } catch (Exception e) {
@@ -100,5 +126,35 @@ public class VacancyController {
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Vacancy> updateVacancy(@PathVariable Long id, @RequestBody Vacancy vacancyRequest) {
+        try {
+            Optional<Vacancy> existingVacancy = vacancyService.findById(id);
+            if (existingVacancy.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
 
+            Vacancy vacancyToUpdate = existingVacancy.get();
+            vacancyToUpdate.setTitle(vacancyRequest.getTitle());
+            vacancyToUpdate.setDescription(vacancyRequest.getDescription());
+            vacancyToUpdate.setRequirements(vacancyRequest.getRequirements());
+            vacancyToUpdate.setStatus(vacancyRequest.getStatus());
+
+            Vacancy updatedVacancy = vacancyService.changeVacancy(vacancyToUpdate);
+
+            return ResponseEntity.ok(updatedVacancy);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteVacancyById(@PathVariable Long id) {
+        if (vacancyService.findById(id).isPresent()) {
+            vacancyService.deleteVacancy(id);
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

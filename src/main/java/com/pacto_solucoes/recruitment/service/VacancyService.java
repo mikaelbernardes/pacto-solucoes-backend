@@ -1,9 +1,6 @@
 package com.pacto_solucoes.recruitment.service;
 
-import com.pacto_solucoes.recruitment.domain.Application;
-import com.pacto_solucoes.recruitment.domain.ApplicationStatus;
-import com.pacto_solucoes.recruitment.domain.User;
-import com.pacto_solucoes.recruitment.domain.Vacancy;
+import com.pacto_solucoes.recruitment.domain.*;
 import com.pacto_solucoes.recruitment.repositories.ApplicationRepository;
 import com.pacto_solucoes.recruitment.repositories.UserRepository;
 import com.pacto_solucoes.recruitment.repositories.VacancyRepository;
@@ -13,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class VacancyService {
@@ -109,6 +107,22 @@ public class VacancyService {
             throw e;
         }
         return null;
+    }
+
+    public Optional<Vacancy> findById(Long id) {
+        return vacancyRepository.findById(id);
+    }
+
+    public List<Vacancy> listVacanciesByUserId(Long userId) {
+        return vacancyRepository.findByUserId(userId);
+    }
+
+    public void deleteVacancy(Long id) {
+        vacancyRepository.deleteById(id);
+    }
+
+    public Vacancy changeVacancy(Vacancy vacancy) {
+        return vacancyRepository.save(vacancy);
     }
 
 }

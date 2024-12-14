@@ -1,4 +1,6 @@
 package com.pacto_solucoes.recruitment.DTOs;
 
-public record LoginResponseDTO(String token) {
+import com.pacto_solucoes.recruitment.domain.UserRole;
+
+public record LoginResponseDTO(String token, Long id, UserRole role) {
 }
